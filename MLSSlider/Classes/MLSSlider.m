@@ -26,7 +26,7 @@ static NSString *const FractionCompletedKeyPath = @"fractionCompleted";
 - (void)awakeFromNib
 {
 	[super awakeFromNib];
-	[self _InitDefault];
+//	[self _InitDefault];
 }
 - (void)_InitDefault
 {
@@ -105,10 +105,6 @@ static NSString *const FractionCompletedKeyPath = @"fractionCompleted";
 - (void)setThumbImage:(UIImage *)thumbImage
 {
 	_thumbImage = thumbImage;
-	if (CGSizeEqualToSize(CGSizeZero, self.thumbSize))
-	{
-		self.thumbSize = thumbImage.size;
-	}
 	[self setNeedsDisplay];
 }
 - (void)setMaximumTrackColor:(UIColor *)maximumTrackColor
@@ -137,11 +133,14 @@ static NSString *const FractionCompletedKeyPath = @"fractionCompleted";
 	UITouch *touch = touches.anyObject;
 	CGPoint location = [touch locationInView:self];
 	
-	CGFloat width = CGRectGetWidth(self.bounds);
-	CGFloat height = CGRectGetHeight(self.bounds);
+	
 	CGFloat minPercent = CZ_LESS_ZERO((self.value - self.minimumValue)) / CZ_LESS_ZERO(self.maximumValue - self.minimumValue);
-	CGFloat minTrackWidth = width * minPercent;
-	CGRect thumbImgRect = CGRectMake(minTrackWidth - self.thumbSize.width * 0.5, (height - self.thumbSize.height) * 0.5, self.thumbSize.width, self.thumbSize.height);
+	CGFloat progressWidth = self.progressSize.width  - self.thumbSize.width;
+	CGFloat minTrackWidth = progressWidth * minPercent;
+	
+	CGFloat x = (CGRectGetWidth(self.bounds) - progressWidth) * 0.5 + minTrackWidth;
+	
+	CGRect thumbImgRect = CGRectMake(x - self.responseSize.width * 0.5, 0, self.responseSize.width, self.responseSize.height);
 	
 	if (CGRectContainsPoint(thumbImgRect, location))
 	{
@@ -159,25 +158,25 @@ static NSString *const FractionCompletedKeyPath = @"fractionCompleted";
 		UITouch *touch = touches.anyObject;
 		CGPoint location = [touch locationInView:self];
 		CGFloat percent = 0.0;
-		if (location.x <= 0)
+		CGFloat minLoc = ((CGRectGetWidth(self.bounds) - self.progressSize.width - self.thumbSize.width) * 0.5);
+		CGFloat maxLoc = ((CGRectGetWidth(self.bounds) + self.progressSize.width + self.thumbSize.width) * 0.5);
+		if (location.x <= minLoc)
 		{
 			percent = 0.0;
 			self.value = self.minimumValue;
 		}
-		else if (location.x >= CGRectGetWidth(self.bounds))
+		else if (location.x >= maxLoc)
 		{
 			percent = 1.0;
 			self.value = self.maximumValue;
 		}
 		else
 		{
-			percent = location.x / CGRectGetWidth(self.bounds);
+			percent = CZ_LESS_ZERO(location.x - minLoc) / (maxLoc - minLoc);
+			
 			self.value = (self.maximumValue - self.minimumValue) * percent;
 		}
 		[self sendActionsForControlEvents:(UIControlEventValueChanged)];
-		
-		[self.totoalProgress becomeCurrentWithPendingUnitCount:(self.totoalProgress.totalUnitCount * percent)];
-		[self.totoalProgress resignCurrent];
 	}
 }
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
@@ -189,83 +188,108 @@ static NSString *const FractionCompletedKeyPath = @"fractionCompleted";
 	self.thumbSel = NO;
 }
 
-- (BOOL)pointInside:(CGPoint)point withEvent:(UIEvent *)event
-{
-	CGFloat margin = ABS(self.thumbSize.height - self.frame.size.height) * 0.5;
-	CGFloat height = self.frame.size.height;
-	CGFloat width  = self.frame.size.width;
-	
-	if (point.y < 0 && (ABS(point.y) < margin))
-	{
-		return YES;
-	}
-	
-	if (point.y > 0 && point.y > height && ((point.y - height) < margin))
-	{
-		return YES;
-	}
-	
-	if (point.x < 0 && (ABS(point.x) < margin))
-	{
-		return YES;
-	}
-	
-	if (point.x > 0 && point.x > width && ((point.x - width) < margin))
-	{
-		return YES;
-	}
-	
-	return [super pointInside:point withEvent:event];
-}
-
 - (void)drawRect:(CGRect)rect
 {
-	[self.backgroundColor setFill];
-	UIRectFill([self bounds]);
-	self.layer.sublayers = nil;
+	[super drawRect:rect];
+	self.layer.contentsScale = [UIScreen mainScreen].scale;
+	
+	if (CGSizeEqualToSize(self.responseSize, CGSizeZero))
+	{
+		self.responseSize = CGSizeMake(CGRectGetHeight(rect), CGRectGetHeight(rect));
+	}
+	if (CGSizeEqualToSize(CGSizeZero, self.thumbSize) || self.thumbSize.height > CGRectGetHeight(rect))
+	{
+		self.thumbSize = CGSizeMake(CGRectGetHeight(rect), CGRectGetHeight(rect));
+	}
+	if (CGSizeEqualToSize(CGSizeZero, self.progressSize))
+	{
+		self.progressSize = CGSizeMake(CGRectGetWidth(rect), CGRectGetHeight(rect) * 0.5);
+	}
+	
+	CGContextRef ctx = UIGraphicsGetCurrentContext();
 	
 	CGFloat minPercent = CZ_LESS_ZERO((self.value - self.minimumValue)) / CZ_LESS_ZERO(self.maximumValue - self.minimumValue);
+	
 	CGFloat bufferPercent = CZ_LESS_ZERO(self.bufferValue - self.minimumValue) / CZ_LESS_ZERO(self.maximumValue - self.minimumValue);
 	
-	CGFloat width = CGRectGetWidth(rect);
-	CGFloat height = CGRectGetHeight(rect);
+	CGFloat progressWidth = self.progressSize.width  - self.thumbSize.width;
 	
-	CGFloat minTrackWidth = width * minPercent;
-	CGRect minTrackRect = CGRectMake(0, 0, minTrackWidth, height);
-	CGRect maxTrackRect = CGRectMake(minTrackWidth, 0, width - minTrackWidth, height);
+	CGFloat progressHeight = self.progressSize.height;
 	
-	CGRect thumbImgRect = CGRectMake(minTrackWidth - self.thumbSize.width * 0.5, (height - self.thumbSize.height) * 0.5, self.thumbSize.width, self.thumbSize.height);
+	CGFloat progressY = CZ_LESS_ZERO((CGRectGetHeight(rect) - progressHeight) * 0.5);
 	
+	CGFloat minTrackWidth = progressWidth * minPercent;
+	
+	CGFloat x = (CGRectGetWidth(rect) - progressWidth) * 0.5;
+	
+	// 左侧已走进度
+	CGRect minTrackRect = CGRectMake(x, progressY, minTrackWidth, progressHeight);
+	
+	// 右侧未走进度
+	x += minTrackWidth;
+	CGRect maxTrackRect = CGRectMake(x, progressY, progressWidth - minTrackWidth, progressHeight);
+	
+	// thumb rect
+	CGRect thumbImgRect = CGRectMake(x - self.thumbSize.width * 0.5, 0, self.thumbSize.width, self.thumbSize.height);
+	
+	// 缓冲进度
 	CGRect bufferRect = CGRectZero;
 	if (bufferPercent > minPercent)
 	{
-		bufferRect = CGRectMake(minTrackWidth, 0, (bufferPercent - minPercent) * width, height);
+		bufferRect = CGRectMake(x, progressY, (bufferPercent - minPercent) * progressWidth, progressHeight);
 	}
 	
-	CALayer *imageLayer = [CALayer layer];
-	imageLayer.contentsScale = [UIScreen mainScreen].scale;
-	imageLayer.frame = thumbImgRect;
-	imageLayer.backgroundColor = self.thumbColor.CGColor;
-	imageLayer.contents = (id)self.thumbImage.CGImage;
-	imageLayer.cornerRadius = thumbImgRect.size.width * 0.5;
-	imageLayer.masksToBounds = YES;
+	[self.backgroundColor setFill];
 	
-	CALayer *minTrackLayer = [CALayer layer];
-	minTrackLayer.frame = minTrackRect;
-	minTrackLayer.backgroundColor = self.minimumTrackColor.CGColor;
+	// 左侧已走进度
+	CGContextSaveGState(ctx);
+	[self.minimumTrackColor setFill];
+	CGContextMoveToPoint(ctx, 0, 0);
+	CGContextAddRect(ctx, minTrackRect);
+	CGContextFillPath(ctx);
+	CGContextRestoreGState(ctx);
 	
-	CALayer *maxTrackLayer = [CALayer layer];
-	maxTrackLayer.frame = maxTrackRect;
-	maxTrackLayer.backgroundColor = self.maximumTrackColor.CGColor;
+	// 右侧未走进度
+	CGContextSaveGState(ctx);
+	[self.maximumTrackColor setFill];
+	CGContextMoveToPoint(ctx, CGRectGetWidth(minTrackRect), 0);
+	CGContextAddRect(ctx, maxTrackRect);
+	CGContextFillPath(ctx);
+	CGContextRestoreGState(ctx);
 	
-	CALayer *bufferTrackLayer = [CALayer layer];
-	bufferTrackLayer.frame = bufferRect;
-	bufferTrackLayer.backgroundColor = self.bufferColor.CGColor;
+	// 缓冲 buffer
+	CGContextSaveGState(ctx);
+	[self.bufferColor setFill];
+	CGContextMoveToPoint(ctx, CGRectGetWidth(bufferRect), 0);
+	CGContextAddRect(ctx, bufferRect);
+	CGContextFillPath(ctx);
+	CGContextRestoreGState(ctx);
 	
-	[self.layer addSublayer:maxTrackLayer];
-	[self.layer addSublayer:bufferTrackLayer];
-	[self.layer addSublayer:minTrackLayer];
-	[self.layer addSublayer:imageLayer];
+	// thumb
+	CGContextSaveGState(ctx);
+	
+	if (self.thumbImage)
+	{
+		//以矩形ctx为依据画一个圆
+		CGContextAddEllipseInRect(ctx, thumbImgRect);
+		//设置裁剪区域
+		CGContextClip(ctx);
+		// 把图片加入smallRect的矩形区域内，超过上面设定的裁剪区域的部分将被裁剪掉
+		CGContextDrawImage(ctx, thumbImgRect, self.thumbImage.CGImage);
+		// 将上下文的内容渲染到视图的layer图层上
+		CGContextStrokePath(ctx);
+	}
+	else
+	{
+		[self.thumbColor setFill];
+		//以矩形ctx为依据画一个圆
+		CGContextAddEllipseInRect(ctx, thumbImgRect);
+		CGContextFillPath(ctx);
+		
+	}
+	CGContextRestoreGState(ctx);
+	
+
 }
 - (void)dealloc
 {

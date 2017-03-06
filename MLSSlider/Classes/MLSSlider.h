@@ -42,9 +42,19 @@
 @property (assign, nonatomic) float bufferValue;
 
 /**
- 自定义滑块大小
+ 自定义滑块大小 Default CGSizeMake(self.bounds.size.height,self.bounds.size.height)
  */
 @property (assign, nonatomic) CGSize thumbSize;
+
+/**
+ 自定义进度高度, Default CGSizeMake(self.bounds.size.width, self.bounds.size.height * 0.5)
+ */
+@property (assign, nonatomic) CGSize progressSize;
+
+/**
+ thumb 响应范围大小 默认 CGSizeMake(self.bounds.size.height, self.bounds.size.height)
+ */
+@property (assign, nonatomic) CGSize responseSize;
 
 /**
  缓冲进度颜色
@@ -75,13 +85,12 @@
 #else // TARGET_INTERFACE_BUILDER
 IB_DESIGNABLE
 @interface MLSSlider : UIControl
-@property (strong, nonatomic) IBInspectable NSProgress *totoalProgress;
-@property (strong, nonatomic) IBInspectable NSProgress *bufferProgress;
 @property (assign, nonatomic) IBInspectable float value;
 @property (assign, nonatomic) IBInspectable float minimumValue;
 @property (assign, nonatomic) IBInspectable float maximumValue;
 @property (assign, nonatomic) IBInspectable float bufferValue;
 @property (assign, nonatomic) IBInspectable CGSize thumbSize;
+@property (assign, nonatomic) IBInspectable CGSize progressSize;
 @property (strong, nonatomic) IBInspectable UIColor *bufferColor;
 @property (strong, nonatomic) IBInspectable UIColor *maximumTrackColor;
 @property (strong, nonatomic) IBInspectable UIColor *minimumTrackColor;

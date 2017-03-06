@@ -23,10 +23,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="svg-OP-zTm" customClass="MLSSlider">
-                                <rect key="frame" x="67" y="47" width="240" height="20"/>
+                                <rect key="frame" x="67" y="47" width="240" height="30"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="20" id="zzg-kC-Qxm"/>
+                                    <constraint firstAttribute="height" constant="30" id="zzg-kC-Qxm"/>
                                 </constraints>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="value">
@@ -41,9 +41,6 @@
                                     <userDefinedRuntimeAttribute type="number" keyPath="bufferValue">
                                         <real key="value" value="0.80000000000000004"/>
                                     </userDefinedRuntimeAttribute>
-                                    <userDefinedRuntimeAttribute type="size" keyPath="thumbSize">
-                                        <size key="value" width="30" height="30"/>
-                                    </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="bufferColor">
                                         <color key="value" red="0.72156862749999995" green="0.72156862749999995" blue="0.72156862749999995" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
@@ -54,8 +51,9 @@
                                         <color key="value" red="0.98013639450000001" green="0.8435268239" blue="0.39719879800000002" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                     </userDefinedRuntimeAttribute>
                                     <userDefinedRuntimeAttribute type="color" keyPath="thumbColor">
-                                        <color key="value" red="1" green="0.84313725490000002" blue="0.31372549020000001" alpha="1" colorSpace="calibratedRGB"/>
+                                        <color key="value" red="1" green="0.84313725490000002" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
                                     </userDefinedRuntimeAttribute>
+                                    <userDefinedRuntimeAttribute type="image" keyPath="thumbImage" value="player_p2_pro"/>
                                 </userDefinedRuntimeAttributes>
                             </view>
                         </subviews>
@@ -69,7 +67,10 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="113" y="215"/>
+            <point key="canvasLocation" x="-2" y="151"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="player_p2_pro" width="20" height="20"/>
+    </resources>
 </document>
