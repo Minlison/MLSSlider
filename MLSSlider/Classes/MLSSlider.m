@@ -49,6 +49,18 @@ static NSString *const FractionCompletedKeyPath = @"fractionCompleted";
 	}
 	return self;
 }
+- (void)setThumbSel:(BOOL)thumbSel
+{
+	_thumbSel = thumbSel;
+	if (thumbSel)
+	{
+		[self sendActionsForControlEvents:(MLSSliderControlEventsValueWillChanged)];
+	}
+	else
+	{
+		[self sendActionsForControlEvents:(MLSSliderControlEventsValueEndChanged)];
+	}
+}
 - (void)setBufferProgress:(NSProgress *)bufferProgress
 {
 	if (!_bufferProgress) {
@@ -176,7 +188,7 @@ static NSString *const FractionCompletedKeyPath = @"fractionCompleted";
 			
 			self.value = (self.maximumValue - self.minimumValue) * percent;
 		}
-		[self sendActionsForControlEvents:(UIControlEventValueChanged)];
+		[self sendActionsForControlEvents:(MLSSliderControlEventsValueDidChanged)];
 	}
 }
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event

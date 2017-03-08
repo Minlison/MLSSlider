@@ -64,6 +64,9 @@
                             <constraint firstAttribute="trailingMargin" secondItem="svg-OP-zTm" secondAttribute="trailing" constant="52" id="Vhd-Th-lQ6"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="slider" destination="svg-OP-zTm" id="M45-jL-Fog"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>

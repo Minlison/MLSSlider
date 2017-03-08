@@ -8,6 +8,14 @@
 
 #import <UIKit/UIKit.h>
 
+typedef NS_OPTIONS(NSInteger, MLSSliderControlEvents)
+{
+	MLSSliderControlEventsValueWillChanged = 1 << 1,
+	MLSSliderControlEventsValueDidChanged = 1 << 2,
+	MLSSliderControlEventsValueEndChanged = 1 << 3,
+};
+
+
 #if !TARGET_INTERFACE_BUILDER
 @interface MLSSlider : UIControl
 
@@ -90,6 +98,7 @@ IB_DESIGNABLE
 @property (assign, nonatomic) IBInspectable float maximumValue;
 @property (assign, nonatomic) IBInspectable float bufferValue;
 @property (assign, nonatomic) IBInspectable CGSize thumbSize;
+@property (assign, nonatomic) IBInspectable CGSize responseSize;
 @property (assign, nonatomic) IBInspectable CGSize progressSize;
 @property (strong, nonatomic) IBInspectable UIColor *bufferColor;
 @property (strong, nonatomic) IBInspectable UIColor *maximumTrackColor;
